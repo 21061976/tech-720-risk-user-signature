@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ ניהול סיכונים - הצהרת שימוש בבינה מלאכותית</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --accent: #e53e3e;
+            --accent-orange: #dd6b20;
+            --accent-green: #38a169;
+            --accent-purple: #805ad5;
+            --bg-light: #f7fafc;
+            --bg-card: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+        .header {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, #6b46c1 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .header .subtitle { font-size: 1.1rem; opacity: 0.9; font-weight: 400; }
+
+        .toolbar {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .toolbar button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary { background: var(--accent-purple); color: white; }
+        .btn-primary:hover { background: #6b46c1; transform: translateY(-1px); }
+        .btn-secondary { background: var(--bg-light); color: var(--text-primary); border: 1px solid var(--border-color) !important; }
+        .btn-secondary:hover { background: var(--border-color); }
+        .btn-success { background: var(--accent-green); color: white; }
+        .btn-danger { background: var(--accent); color: white; }
+
+        .edit-mode-indicator {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 8px;
+            font-weight: 500;
+            margin-right: auto;
+        }
+
+        .edit-mode-indicator.active { display: flex; }
+
+        .section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--bg-light);
+        }
+
+        .section-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .section-icon { font-size: 1.5rem; }
+
+        .context-box {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            border: 2px solid #d6bcfa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .context-box h3 {
+            color: var(--accent-purple);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .context-highlight {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-right: 4px solid var(--accent-purple);
+        }
+
+        .declaration-points {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .declaration-point {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .declaration-point:hover {
+            border-color: var(--accent-purple);
+            box-shadow: var(--shadow);
+        }
+
+        .declaration-point h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .declaration-point p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .legend-planning { background: #e9d8fd; color: #553c9a; }
+        .legend-execution { background: #bee3f8; color: #2b6cb0; }
+        .legend-control { background: #c6f6d5; color: #276749; }
+
+        .category-header {
+            background: linear-gradient(90deg, var(--accent-purple) 0%, #6b46c1 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0 1.5rem 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .risk-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--bg-light);
+            transition: all 0.2s ease;
+        }
+
+        .risk-card:hover { box-shadow: var(--shadow); }
+
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .risk-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-high {
+            background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+            color: #c53030;
+            border: 1px solid #fc8181;
+        }
+
+        .badge-medium {
+            background: linear-gradient(135deg, #feebc8 0%, #fbd38d 100%);
+            color: #c05621;
+            border: 1px solid #f6ad55;
+        }
+
+        .badge-low {
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            color: #276749;
+            border: 1px solid #68d391;
+        }
+
+        .risk-scores {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .score-item {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .score-item strong { color: var(--text-primary); }
+
+        .risk-description {
+            margin-bottom: 1.25rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border-right: 4px solid var(--accent-purple);
+        }
+
+        .challenge-box {
+            background: #fef3c7;
+            border: 1px solid #f6ad55;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-box h4 {
+            color: #c05621;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .implications-section, .opportunities-section { margin-bottom: 1.25rem; }
+
+        .implications-section h4, .opportunities-section h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .implications-section ul, .opportunities-section ul {
+            list-style: none;
+            padding-right: 0;
+        }
+
+        .implications-section li, .opportunities-section li {
+            padding: 0.5rem 0;
+            padding-right: 1.5rem;
+            position: relative;
+        }
+
+        .implications-section li::before {
+            content: '⚠️';
+            position: absolute;
+            right: 0;
+            font-size: 0.8rem;
+        }
+
+        .opportunities-section li::before {
+            content: '💡';
+            position: absolute;
+            right: 0;
+            font-size: 0.8rem;
+        }
+
+        .standard-gap {
+            background: #fed7e2;
+            border: 1px solid #fc8181;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .standard-gap h4 {
+            color: #c53030;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mitigation-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .mitigation-section h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .mitigation-item {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            border-right: 3px solid var(--accent-green);
+        }
+
+        .mitigation-item:last-child { margin-bottom: 0; }
+
+        .mitigation-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .phase-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .phase-planning { background: #e9d8fd; color: #553c9a; }
+        .phase-execution { background: #bee3f8; color: #2b6cb0; }
+        .phase-control { background: #c6f6d5; color: #276749; }
+
+        .mitigation-target {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .standard-recommendation {
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            border: 1px solid #68d391;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .standard-recommendation h4 {
+            color: #276749;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-card {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-card .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card .label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .summary-card.high .number { color: var(--accent); }
+        .summary-card.medium .number { color: var(--accent-orange); }
+        .summary-card.low .number { color: var(--accent-green); }
+
+        .table-container { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: var(--accent-purple);
+            color: white;
+            padding: 1rem;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        tr:hover td { background: var(--bg-light); }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .footer strong { color: var(--primary); }
+
+        .editable { transition: all 0.2s ease; }
+
+        body.edit-mode .editable {
+            outline: 2px dashed var(--accent-purple);
+            outline-offset: 2px;
+            cursor: text;
+        }
+
+        body.edit-mode .editable:hover { background: #fef3c7; }
+        body.edit-mode .editable:focus { outline: 2px solid var(--accent-purple); background: #fffbeb; }
+
+        @media print {
+            body { background: white; }
+            .toolbar { display: none; }
+            .container { padding: 0; }
+            .section { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
+            .risk-card { break-inside: avoid; }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .header { padding: 1.5rem; }
+            .header h1 { font-size: 1.6rem; }
+            .toolbar { flex-direction: column; }
+            .toolbar button { width: 100%; justify-content: center; }
+            .risk-header { flex-direction: column; }
+            .declaration-points { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="editable">🤖 ניהול סיכונים - הצהרת שימוש בבינה מלאכותית</h1>
+            <p class="subtitle editable">ניתוח סיכונים ל-4 נקודות ההצהרה שנבחרו לטיפול | פרויקט 720</p>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button class="btn-primary" onclick="toggleEditMode()">
+                <span>✏️</span> מצב עריכה
+            </button>
+            <button class="btn-success" onclick="saveChanges()" style="display:none;" id="saveBtn">
+                <span>💾</span> שמור שינויים
+            </button>
+            <button class="btn-danger" onclick="cancelChanges()" style="display:none;" id="cancelBtn">
+                <span>❌</span> בטל שינויים
+            </button>
+            <button class="btn-secondary" onclick="window.print()">
+                <span>🖨️</span> הדפס
+            </button>
+            <button class="btn-secondary" onclick="exportHTML()">
+                <span>📥</span> ייצא HTML
+            </button>
+            <div class="edit-mode-indicator" id="editIndicator">
+                <span>✏️</span> מצב עריכה פעיל
+            </div>
+        </div>
+
+        <!-- Section: Context -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">📋</span>
+                <h2 class="editable">הקשר - הצהרת שימוש תלמידים בבינה מלאכותית</h2>
+            </div>
+
+            <div class="context-box">
+                <h3>🎯 הרקע</h3>
+                <p class="editable">
+                    קיימת <strong>הצהרת שימוש תלמידים בבינה מלאכותית</strong> שעליה ספקים אמורים לחתום כדי לקבל אישור משרד החינוך. בהצהרה יש מספר נקודות ש<strong>אינן מוגדרות כראוי</strong> - לא קיים עדיין תקן ולא לגמרי ברור איזה תקן כדאי ליישם.
+                </p>
+                
+                <div class="context-highlight">
+                    <strong>🎯 המטרה:</strong> לנתח את הסיכונים הנובעים מכל נקודת הצהרה, ולהבין כיצד לנהל אותם - כחלק מבניית תקן עתידי.
+                </div>
+            </div>
+
+            <h4 style="font-weight: 600; margin-bottom: 1rem; color: var(--accent-purple);">📌 4 נקודות ההצהרה שנבחרו לטיפול:</h4>
+
+            <div class="declaration-points">
+                <div class="declaration-point">
+                    <h4>1️⃣ חובת גילוי</h4>
+                    <p class="editable">חובת גילוי, המותאמת למשתמש, בדבר היות המערכת מבוססת בינה מלאכותית</p>
+                </div>
+                <div class="declaration-point">
+                    <h4>2️⃣ מעורבות אנושית</h4>
+                    <p class="editable">חובת קיום מעורבות אנושית והגבלת פעולות אוטומטיות</p>
+                </div>
+                <div class="declaration-point">
+                    <h4>3️⃣ זיהוי מצוקות רגשיות</h4>
+                    <p class="editable">קביעת מנגנונים לזיהוי מצוקות רגשיות של תלמידים ונקיטת פעולות להבטחת שלומותם</p>
+                </div>
+                <div class="declaration-point">
+                    <h4>4️⃣ זיהוי הטיות והזיות</h4>
+                    <p class="editable">קביעת מנגנונים לזיהוי הטיות או הזיות של המערכת</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Risk Management -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">⚠️</span>
+                <h2 class="editable">ניהול סיכונים - לפי נקודות ההצהרה</h2>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <span style="font-weight: 600; margin-left: 1rem;">📋 מקרא שלבי פיילוט:</span>
+                <div class="legend-item">
+                    <div class="legend-icon legend-planning">📐</div>
+                    <div><strong>תכנון</strong></div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon legend-execution">⚙️</div>
+                    <div><strong>ביצוע</strong></div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon legend-control">📊</div>
+                    <div><strong>בקרה</strong></div>
+                </div>
+            </div>
+
+            <!-- Declaration Point 1: Disclosure -->
+            <div class="category-header editable">📁 נקודה 1: חובת גילוי בדבר היות המערכת מבוססת בינה מלאכותית</div>
+
+            <!-- Risk 1.1 -->
+            <div class="risk-card">
+                <div class="risk-header">
+                    <div class="risk-title editable">1.1 אי-בהירות בהגדרת "גילוי מותאם למשתמש"</div>
+                    <div class="risk-badge badge-high">גבוהה 🔴</div>
+                </div>
+                <div class="risk-scores">
+                    <span class="score-item">הסתברות: <strong>9/10</strong></span>
+                    <span class="score-item">השפעה: <strong>7/10</strong></span>
+                    <span class="score-item">חומרה: <strong>63</strong></span>
+                </div>
+
+                <div class="standard-gap">
+                    <h4>🔍 פער בתקן הקיים:</h4>
+                    <p class="editable">לא מוגדר מהו "גילוי מותאם" - האם מדובר בשפה פשוטה? גודל טקסט? מיקום בממשק? האם נדרש גילוי בכל אינטראקציה או פעם אחת? כיצד מותאמים לגיל התלמיד?</p>
+                </div>
+
+                <div class="risk-description editable">
+                    <strong>תיאור הסיכון:</strong><br>
+                    ללא הגדרה ברורה של "גילוי מותאם למשתמש", <strong>כל ספק יישם את הדרישה באופן שונה</strong>. תלמיד בכיתה ז' עלול לקבל גילוי בשפה משפטית מורכבת, או לא לשים לב להודעה קטנה בפינת המסך. חוסר עקביות יפגע בשקיפות ובאמון.
+                </div>
+                
+                <div class="implications-section">
+                    <h4>📉 השלכות אפשריות:</h4>
+                    <ul>
+                        <li class="editable">תלמידים לא מבינים שהם מתקשרים עם AI</li>
+                        <li class="editable">הורים לא מודעים לשימוש ב-AI בלמידת ילדיהם</li>
+                        <li class="editable">חוסר עקביות בין ספקים שונים</li>
+                        <li class="editable">קושי באכיפה ובדיקת עמידה בדרישה</li>
+                        <li class="editable">סיכון משפטי אם נטען שהגילוי לא היה מספק</li>
+                    </ul>
+                </div>
+
+                <div class="opportunities-section">
+                    <h4>💡 הזדמנויות:</h4>
+                    <ul>
+                        <li class="editable">בניית תקן ישראלי מוביל לגילוי AI בחינוך</li>
+                        <li class="editable">שיפור אוריינות דיגיטלית של תלמידים</li>
+                    </ul>
+                </div>
+
+                <div class="mitigation-section">
+                    <h4>🔧 פעילויות מתקנות:</h4>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">א. הגדרת רמות גילוי לפי גיל</span>
+                        </div>
+                        <p class="editable">יצירת מדריך עם דוגמאות לניסוח גילוי לפי שכבות גיל: א'-ג' (פשוט מאוד), ד'-ו' (מובנה), ז'-ט' (מפורט), י'-י"ב (מלא).</p>
+                        <div class="mitigation-target">מרכיב סיכון: חוסר התאמה לגיל המשתמש</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">ב. קביעת מיקום ותדירות הגילוי</span>
+                        </div>
+                        <p class="editable">הגדרה: גילוי ראשוני בכניסה למערכת + אייקון קבוע שמסמן AI + תזכורת בכל אינטראקציה משמעותית.</p>
+                        <div class="mitigation-target">מרכיב סיכון: גילוי שקוף מדי או חד-פעמי</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-execution">⚙️ ביצוע</span>
+                            <span class="editable">ג. פיתוח רכיב UI סטנדרטי לגילוי</span>
+                        </div>
+                        <p class="editable">יצירת קומפוננטת ממשק מוכנה (SDK) שספקים יכולים לשלב - מבטיחה עקביות ומקלה על יישום.</p>
+                        <div class="mitigation-target">מרכיב סיכון: שונות ביישום בין ספקים</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-control">📊 בקרה</span>
+                            <span class="editable">ד. בדיקת הבנה עם תלמידים</span>
+                        </div>
+                        <p class="editable">מחקר משתמשים עם תלמידים מגילאים שונים - האם הם מבינים שמדובר ב-AI? האם הגילוי ברור?</p>
+                        <div class="mitigation-target">מרכיב סיכון: גילוי שאינו אפקטיבי</div>
+                    </div>
+                </div>
+
+                <div class="standard-recommendation">
+                    <h4>📋 המלצה לתקן:</h4>
+                    <p class="editable">להגדיר <strong>"גילוי מותאם"</strong> כגילוי שעומד ב-3 קריטריונים: (1) שפה מותאמת לגיל, (2) מיקום בולט וקבוע בממשק, (3) תדירות - בכל התחלת שיחה עם AI ובכל יצירת תוכן על ידי AI.</p>
+                </div>
+            </div>
+
+            <!-- Risk 1.2 -->
+            <div class="risk-card">
+                <div class="risk-header">
+                    <div class="risk-title editable">1.2 קושי בזיהוי רכיבי AI "מוסתרים"</div>
+                    <div class="risk-badge badge-medium">בינונית 🟠</div>
+                </div>
+                <div class="risk-scores">
+                    <span class="score-item">הסתברות: <strong>7/10</strong></span>
+                    <span class="score-item">השפעה: <strong>6/10</strong></span>
+                    <span class="score-item">חומרה: <strong>42</strong></span>
+                </div>
+
+                <div class="risk-description editable">
+                    <strong>תיאור הסיכון:</strong><br>
+                    מערכות רבות משתמשות ב-AI ב"רקע" - המלצות תוכן, התאמת קושי, ניתוח תשובות. <strong>לא ברור האם נדרש גילוי גם על רכיבי AI שאינם "שיחה"</strong> - מה שעלול ליצור פער בין הציפייה לגילוי לבין המציאות.
+                </div>
+                
+                <div class="implications-section">
+                    <h4>📉 השלכות אפשריות:</h4>
+                    <ul>
+                        <li class="editable">גילוי חלקי שמסתיר שימושים משמעותיים ב-AI</li>
+                        <li class="editable">תלמידים לא מודעים שהמערכת "לומדת" עליהם</li>
+                        <li class="editable">ספקים מדווחים רק על AI "גלוי"</li>
+                    </ul>
+                </div>
+
+                <div class="mitigation-section">
+                    <h4>🔧 פעילויות מתקנות:</h4>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">א. מיפוי סוגי שימוש ב-AI ודרישות גילוי לכל סוג</span>
+                        </div>
+                        <p class="editable">טבלה שמגדירה: AI גנרטיבי (גילוי מלא), המלצות (גילוי כללי), ניתוח (גילוי במדיניות פרטיות).</p>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-execution">⚙️ ביצוע</span>
+                            <span class="editable">ב. דרישת "מפת AI" מכל ספק</span>
+                        </div>
+                        <p class="editable">כל ספק יגיש מסמך שמפרט את כל השימושים ב-AI במערכת - גלויים ו"מוסתרים".</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Declaration Point 2: Human Oversight -->
+            <div class="category-header editable">📁 נקודה 2: חובת מעורבות אנושית והגבלת פעולות אוטומטיות</div>
+
+            <!-- Risk 2.1 -->
+            <div class="risk-card">
+                <div class="risk-header">
+                    <div class="risk-title editable">2.1 הגדרה לא ברורה של "פעולות אוטומטיות" שיש להגביל</div>
+                    <div class="risk-badge badge-high">גבוהה 🔴</div>
+                </div>
+                <div class="risk-scores">
+                    <span class="score-item">הסתברות: <strong>8/10</strong></span>
+                    <span class="score-item">השפעה: <strong>8/10</strong></span>
+                    <span class="score-item">חומרה: <strong>64</strong></span>
+                </div>
+
+                <div class="standard-gap">
+                    <h4>🔍 פער בתקן הקיים:</h4>
+                    <p class="editable">לא מוגדר אילו פעולות אוטומטיות מותרות ואילו אסורות. האם AI יכול לתת ציון אוטומטי? להמליץ על מסלול למידה? לשלוח הודעה להורים? מה רמת ה"מעורבות האנושית" הנדרשת?</p>
+                </div>
+
+                <div class="risk-description editable">
+                    <strong>תיאור הסיכון:</strong><br>
+                    ללא הגדרה ברורה של רמות אוטומציה מותרות, <strong>ספקים עלולים לפרש את הדרישה באופנים קיצוניים</strong> - או להגביל יתר על המידה (פוגע בחוויה), או להתיר יותר מדי (פוגע בבטיחות). במיוחד רגיש כשמדובר בהחלטות שמשפיעות על התלמיד.
+                </div>
+                
+                <div class="implications-section">
+                    <h4>📉 השלכות אפשריות:</h4>
+                    <ul>
+                        <li class="editable">החלטות משמעותיות (ציונים, שיבוץ) ללא פיקוח אנושי</li>
+                        <li class="editable">עומס יתר על מורים אם כל פעולה דורשת אישור</li>
+                        <li class="editable">חוסר עקביות - ספק אחד מאשר אוטומטית, אחר לא</li>
+                        <li class="editable">פגיעה בחוויית משתמש אם יש יותר מדי "נקודות עצירה"</li>
+                    </ul>
+                </div>
+
+                <div class="mitigation-section">
+                    <h4>🔧 פעילויות מתקנות:</h4>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">א. סיווג פעולות לפי רמת סיכון</span>
+                        </div>
+                        <p class="editable">
+                            <strong>רמה 1 (אוטומטי מלא):</strong> המלצת תוכן, התאמת קושי, משוב על תרגילים<br>
+                            <strong>רמה 2 (אוטומטי + התראה):</strong> ציון מבחן, זיהוי קושי לימודי<br>
+                            <strong>רמה 3 (אישור אנושי):</strong> שינוי מסלול, דיווח להורים, סיווג תלמיד
+                        </p>
+                        <div class="mitigation-target">מרכיב סיכון: חוסר בהירות מה מותר</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">ב. הגדרת "מעורבות אנושית" לכל רמה</span>
+                        </div>
+                        <p class="editable">רמה 2: המורה מקבל התראה ויכול לשנות. רמה 3: הפעולה לא מתבצעת ללא אישור פעיל של המורה.</p>
+                        <div class="mitigation-target">מרכיב סיכון: פרשנויות שונות ל"מעורבות"</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-execution">⚙️ ביצוע</span>
+                            <span class="editable">ג. בניית ממשק Dashboard למורה</span>
+                        </div>
+                        <p class="editable">ממשק שמציג למורה את כל הפעולות האוטומטיות שבוצעו ומאפשר לו לשנות/לבטל.</p>
+                        <div class="mitigation-target">מרכיב סיכון: חוסר שקיפות על פעולות אוטומטיות</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-control">📊 בקרה</span>
+                            <span class="editable">ד. ניטור שיעור ההתערבות האנושית</span>
+                        </div>
+                        <p class="editable">מדידה: כמה פעולות רמה 3 מאושרות ע"י מורים? כמה נדחות? זיהוי דפוסים.</p>
+                        <div class="mitigation-target">מרכיב סיכון: מעורבות אנושית "על הנייר" בלבד</div>
+                    </div>
+                </div>
+
+                <div class="standard-recommendation">
+                    <h4>📋 המלצה לתקן:</h4>
+                    <p class="editable">לאמץ מודל <strong>3 רמות אוטומציה</strong> עם טבלה ברורה שמסווגת כל סוג פעולה. לדרוש מספקים לתעד את רמת האוטומציה של כל פיצ'ר ולהציג למורים לוח בקרה.</p>
+                </div>
+            </div>
+
+            <!-- Risk 2.2 -->
+            <div class="risk-card">
+                <div class="risk-header">
+                    <div class="risk-title editable">2.2 עומס על מורים מדרישת אישורים מוגזמת</div>
+                    <div class="risk-badge badge-medium">בינונית 🟠</div>
+                </div>
+                <div class="risk-scores">
+                    <span class="score-item">הסתברות: <strong>6/10</strong></span>
+                    <span class="score-item">השפעה: <strong>6/10</strong></span>
+                    <span class="score-item">חומרה: <strong>36</strong></span>
+                </div>
+
+                <div class="risk-description editable">
+                    <strong>תיאור הסיכון:</strong><br>
+                    אם הדרישה ל"מעורבות אנושית" תפורש בצורה קיצונית, <strong>מורים יוצפו בבקשות אישור</strong> שיפגעו ביכולתם לעבוד ויגרמו ל"עייפות אישורים" - מצב שבו מאשרים הכל בלי לבדוק.
+                </div>
+                
+                <div class="implications-section">
+                    <h4>📉 השלכות אפשריות:</h4>
+                    <ul>
+                        <li class="editable">מורים מאשרים אוטומטית בלי לקרוא</li>
+                        <li class="editable">זמן הוראה מבוזבז על ניהול מערכת</li>
+                        <li class="editable">התנגדות לשימוש במערכות AI בחינוך</li>
+                    </ul>
+                </div>
+
+                <div class="mitigation-section">
+                    <h4>🔧 פעילויות מתקנות:</h4>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">א. מיקוד באישורים קריטיים בלבד</span>
+                        </div>
+                        <p class="editable">רק פעולות עם השפעה משמעותית על התלמיד ידרשו אישור. השאר - התראה + יכולת שינוי.</p>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-execution">⚙️ ביצוע</span>
+                            <span class="editable">ב. ממשק יעיל לאישורים מרוכזים</span>
+                        </div>
+                        <p class="editable">אפשרות לאשר מספר פעולות במכה אחת, סינון לפי דחיפות, ברירות מחדל חכמות.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Declaration Point 3: Emotional Distress -->
+            <div class="category-header editable">📁 נקודה 3: זיהוי מצוקות רגשיות והבטחת שלומות תלמידים</div>
+
+            <!-- Risk 3.1 -->
+            <div class="risk-card">
+                <div class="risk-header">
+                    <div class="risk-title editable">3.1 אי-דיוק בזיהוי מצוקות רגשיות (False Positives/Negatives)</div>
+                    <div class="risk-badge badge-high">גבוהה 🔴</div>
+                </div>
+                <div class="risk-scores">
+                    <span class="score-item">הסתברות: <strong>8/10</strong></span>
+                    <span class="score-item">השפעה: <strong>9/10</strong></span>
+                    <span class="score-item">חומרה: <strong>72</strong></span>
+                </div>
+
+                <div class="standard-gap">
+                    <h4>🔍 פער בתקן הקיים:</h4>
+                    <p class="editable">לא מוגדר מה נחשב "מצוקה רגשית", אילו סימנים לחפש, מה רמת הדיוק הנדרשת, ומה לעשות כשיש זיהוי. טכנולוגיית זיהוי רגשות היא לא מדויקת ורגישה להטיות תרבותיות.</p>
+                </div>
+
+                <div class="risk-description editable">
+                    <strong>תיאור הסיכון:</strong><br>
+                    מערכות AI לזיהוי רגשות הן <strong>לא מדויקות ורגישות להקשר</strong>. False Positive (זיהוי שגוי של מצוקה) יגרום לפאניקה מיותרת ופגיעה בתלמיד. False Negative (אי-זיהוי מצוקה אמיתית) עלול להיות קטלני. זו אחריות כבדה להטיל על מערכת טכנולוגית.
+                </div>
+                
+                <div class="challenge-box">
+                    <h4>🚨 אתגר מיוחד - רגישות גבוהה:</h4>
+                    <p class="editable">זיהוי מצוקות רגשיות נוגע לנושאים רגישים ביותר: דיכאון, חרדה, התעללות, מחשבות אובדניות. טעות בכיוון כלשהו יכולה לגרום נזק משמעותי לתלמיד.</p>
+                </div>
+                
+                <div class="implications-section">
+                    <h4>📉 השלכות אפשריות:</h4>
+                    <ul>
+                        <li class="editable">False Positive: תלמיד מתויג שלא בצדק, פגיעה בפרטיות, לחץ מיותר על משפחה</li>
+                        <li class="editable">False Negative: מצוקה אמיתית לא מזוהה, סיכון לשלום התלמיד</li>
+                        <li class="editable">הטיות תרבותיות: זיהוי שונה לתלמידים מרקעים שונים</li>
+                        <li class="editable">אחריות משפטית: מי אחראי אם המערכת טעתה?</li>
+                    </ul>
+                </div>
+
+                <div class="mitigation-section">
+                    <h4>🔧 פעילויות מתקנות:</h4>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">א. הגדרת תפקיד המערכת כ"סיוע" ולא "אבחון"</span>
+                        </div>
+                        <p class="editable">המערכת מזהה סימנים ומתריעה לאיש מקצוע - היא לא מאבחנת ולא פועלת באופן עצמאי. ההחלטה תמיד של אדם.</p>
+                        <div class="mitigation-target">מרכיב סיכון: הסתמכות יתר על טכנולוגיה</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">ב. הגדרת רמות התראה מדורגות</span>
+                        </div>
+                        <p class="editable">
+                            <strong>רמה 1:</strong> סימן בודד → תיעוד פנימי<br>
+                            <strong>רמה 2:</strong> מספר סימנים → התראה ליועץ<br>
+                            <strong>רמה 3:</strong> סימנים חמורים → התראה מיידית + פרוטוקול חירום
+                        </p>
+                        <div class="mitigation-target">מרכיב סיכון: תגובה לא מותאמת לחומרה</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">ג. שיתוף פעולה עם אנשי מקצוע בבריאות הנפש</span>
+                        </div>
+                        <p class="editable">הגדרת הפרוטוקולים בשיתוף פסיכולוגים חינוכיים ויועצים - לא רק מהנדסים.</p>
+                        <div class="mitigation-target">מרכיב סיכון: פרוטוקול לא מקצועי</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-execution">⚙️ ביצוע</span>
+                            <span class="editable">ד. בדיקת הטיות תרבותיות</span>
+                        </div>
+                        <p class="editable">בדיקת המערכת על אוכלוסיות מגוונות - ערבים, חרדים, עולים חדשים - וודא שאין הטיות.</p>
+                        <div class="mitigation-target">מרכיב סיכון: הטיות בזיהוי</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-control">📊 בקרה</span>
+                            <span class="editable">ה. מעקב אחר דיוק הזיהוי</span>
+                        </div>
+                        <p class="editable">מדידת שיעורי False Positive/Negative, קבלת משוב מיועצים על איכות ההתראות.</p>
+                        <div class="mitigation-target">מרכיב סיכון: אי-ידיעה על טיב הזיהוי</div>
+                    </div>
+                </div>
+
+                <div class="standard-recommendation">
+                    <h4>📋 המלצה לתקן:</h4>
+                    <p class="editable">להגדיר שמערכת AI היא <strong>כלי סיוע לזיהוי ולא כלי אבחון</strong>. לדרוש פרוטוקול מדורג שמערב תמיד איש מקצוע אנושי, ולחייב דיווח על שיעורי דיוק ובדיקות הטיות.</p>
+                </div>
+            </div>
+
+            <!-- Risk 3.2 -->
+            <div class="risk-card">
+                <div class="risk-header">
+                    <div class="risk-title editable">3.2 פגיעה בפרטיות מניטור רגשי</div>
+                    <div class="risk-badge badge-medium">בינונית 🟠</div>
+                </div>
+                <div class="risk-scores">
+                    <span class="score-item">הסתברות: <strong>7/10</strong></span>
+                    <span class="score-item">השפעה: <strong>6/10</strong></span>
+                    <span class="score-item">חומרה: <strong>42</strong></span>
+                </div>
+
+                <div class="risk-description editable">
+                    <strong>תיאור הסיכון:</strong><br>
+                    ניטור רגשי מחייב איסוף מידע אישי רגיש: תוכן כתיבה, דפוסי התנהגות, אינטראקציות. <strong>ילדים וגם הורים עלולים להרגיש "מרוגלים"</strong>. יש לאזן בין הגנה על שלומות לפגיעה בפרטיות.
+                </div>
+                
+                <div class="implications-section">
+                    <h4>📉 השלכות אפשריות:</h4>
+                    <ul>
+                        <li class="editable">תחושת מעקב שפוגעת בחופש הביטוי</li>
+                        <li class="editable">תלמידים "מנקים" את מה שהם כותבים</li>
+                        <li class="editable">התנגדות הורים לשימוש במערכת</li>
+                    </ul>
+                </div>
+
+                <div class="mitigation-section">
+                    <h4>🔧 פעילויות מתקנות:</h4>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">א. שקיפות מלאה למשתמשים</span>
+                        </div>
+                        <p class="editable">הסבר ברור לתלמידים ולהורים מה נאסף, למה, ומי רואה את המידע.</p>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">ב. מינימום נתונים (Data Minimization)</span>
+                        </div>
+                        <p class="editable">לאסוף רק את המידע ההכרחי לזיהוי מצוקה, לא "הכל למקרה".</p>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-execution">⚙️ ביצוע</span>
+                            <span class="editable">ג. הסכמה מדעת מהורים</span>
+                        </div>
+                        <p class="editable">הסכמה ספציפית לפיצ'ר זיהוי המצוקות, לא רק הסכמה כללית לשימוש.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Declaration Point 4: Bias & Hallucinations -->
+            <div class="category-header editable">📁 נקודה 4: זיהוי הטיות והזיות של המערכת</div>
+
+            <!-- Risk 4.1 -->
+            <div class="risk-card">
+                <div class="risk-header">
+                    <div class="risk-title editable">4.1 הזיות AI (Hallucinations) בתוכן לימודי</div>
+                    <div class="risk-badge badge-high">גבוהה 🔴</div>
+                </div>
+                <div class="risk-scores">
+                    <span class="score-item">הסתברות: <strong>9/10</strong></span>
+                    <span class="score-item">השפעה: <strong>7/10</strong></span>
+                    <span class="score-item">חומרה: <strong>63</strong></span>
+                </div>
+
+                <div class="standard-gap">
+                    <h4>🔍 פער בתקן הקיים:</h4>
+                    <p class="editable">לא מוגדר מה נחשב "הזיה", איך למדוד אותה, מה שיעור ההזיות המקסימלי המותר, ומה לעשות כשמזהים הזיה. הזיות של AI גנרטיבי הן בעיה ידועה שאין לה פתרון טכנולוגי מושלם.</p>
+                </div>
+
+                <div class="risk-description editable">
+                    <strong>תיאור הסיכון:</strong><br>
+                    מערכות AI גנרטיבי <strong>"ממציאות" מידע בביטחון גבוה</strong> - עובדות שגויות, ציטוטים בדויים, מקורות לא קיימים. בהקשר חינוכי, תלמידים עלולים ללמוד מידע שגוי ולהאמין שהוא נכון כי "המחשב אמר".
+                </div>
+                
+                <div class="implications-section">
+                    <h4>📉 השלכות אפשריות:</h4>
+                    <ul>
+                        <li class="editable">תלמידים לומדים עובדות שגויות</li>
+                        <li class="editable">פגיעה באמינות המערכת כשמתגלות הזיות</li>
+                        <li class="editable">קושי להבחין בין תוכן אמין לבדוי</li>
+                        <li class="editable">בעיות במבחנים אם תלמיד למד מידע שגוי</li>
+                    </ul>
+                </div>
+
+                <div class="mitigation-section">
+                    <h4>🔧 פעילויות מתקנות:</h4>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">א. הגדרת סוגי תוכן ורמות בדיקה</span>
+                        </div>
+                        <p class="editable">
+                            <strong>תוכן עובדתי (היסטוריה, מדע):</strong> בדיקה מלאה לפני הצגה<br>
+                            <strong>תוכן יצירתי (כתיבה, סיעור מוחות):</strong> גמישות גבוהה יותר<br>
+                            <strong>תוכן המשפיע על ציונים:</strong> אפס סובלנות לשגיאות
+                        </p>
+                        <div class="mitigation-target">מרכיב סיכון: יחס אחיד לכל סוגי התוכן</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">ב. שילוב מנגנוני RAG ומקורות</span>
+                        </div>
+                        <p class="editable">חיבור ה-AI למאגרי מידע מאומתים (ספרי לימוד מאושרים), חובת ציטוט מקור לכל עובדה.</p>
+                        <div class="mitigation-target">מרכיב סיכון: תוכן לא מבוסס</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-execution">⚙️ ביצוע</span>
+                            <span class="editable">ג. מנגנון דיווח על שגיאות</span>
+                        </div>
+                        <p class="editable">כפתור פשוט "משהו לא נכון?" שמאפשר לתלמידים ומורים לדווח על הזיות.</p>
+                        <div class="mitigation-target">מרכיב סיכון: הזיות שלא מזוהות</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-control">📊 בקרה</span>
+                            <span class="editable">ד. מדידת שיעור הזיות</span>
+                        </div>
+                        <p class="editable">דגימה שבועית של תכנים שהמערכת יצרה, בדיקה ידנית של דיוק, מעקב אחר מגמות.</p>
+                        <div class="mitigation-target">מרכיב סיכון: אי-ידיעה על היקף הבעיה</div>
+                    </div>
+                </div>
+
+                <div class="standard-recommendation">
+                    <h4>📋 המלצה לתקן:</h4>
+                    <p class="editable">לדרוש מספקים: (1) ציון מקור לכל תוכן עובדתי, (2) מנגנון דיווח נגיש, (3) דיווח רבעוני על שיעור הזיות מדגמי. לשקול הגדרת <strong>רף מקסימלי להזיות</strong> (למשל: פחות מ-2% בתוכן עובדתי).</p>
+                </div>
+            </div>
+
+            <!-- Risk 4.2 -->
+            <div class="risk-card">
+                <div class="risk-header">
+                    <div class="risk-title editable">4.2 הטיות (Bias) בתוכן ובהמלצות</div>
+                    <div class="risk-badge badge-high">גבוהה 🔴</div>
+                </div>
+                <div class="risk-scores">
+                    <span class="score-item">הסתברות: <strong>8/10</strong></span>
+                    <span class="score-item">השפעה: <strong>8/10</strong></span>
+                    <span class="score-item">חומרה: <strong>64</strong></span>
+                </div>
+
+                <div class="standard-gap">
+                    <h4>🔍 פער בתקן הקיים:</h4>
+                    <p class="editable">לא מוגדר אילו הטיות לבדוק, כיצד לזהות אותן, ומה נחשב הטיה "מקובלת". הטיות יכולות להיות מגדריות, תרבותיות, סוציו-אקונומיות, או קשורות ללקויות למידה.</p>
+                </div>
+
+                <div class="risk-description editable">
+                    <strong>תיאור הסיכון:</strong><br>
+                    מערכות AI <strong>משקפות ומעצימות הטיות</strong> מנתוני האימון. בחינוך, הטיות עלולות להתבטא בתוכן (סטריאוטיפים מגדריים), בהמלצות (שיבוץ למסלולים לפי רקע), או בהערכה (ציונים שונים לקבוצות שונות).
+                </div>
+                
+                <div class="implications-section">
+                    <h4>📉 השלכות אפשריות:</h4>
+                    <ul>
+                        <li class="editable">תוכן שמנציח סטריאוטיפים (בנים/בנות, מזרחים/אשכנזים)</li>
+                        <li class="editable">המלצות מסלול מוטות לפי רקע סוציו-אקונומי</li>
+                        <li class="editable">הערכה לא שוויונית של תלמידים מרקעים שונים</li>
+                        <li class="editable">חיזוק פערים קיימים במקום צמצומם</li>
+                    </ul>
+                </div>
+
+                <div class="mitigation-section">
+                    <h4>🔧 פעילויות מתקנות:</h4>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">א. הגדרת קטגוריות הטיות לבדיקה</span>
+                        </div>
+                        <p class="editable">רשימה ברורה: מגדר, מוצא, דת, סוציו-אקונומי, לקויות למידה, שפת אם. לכל קטגוריה - מדדי בדיקה.</p>
+                        <div class="mitigation-target">מרכיב סיכון: בדיקה לא מקיפה</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-execution">⚙️ ביצוע</span>
+                            <span class="editable">ב. בדיקות Fairness על מודלים</span>
+                        </div>
+                        <p class="editable">שימוש בכלי בדיקת הוגנות (Fairness Toolkit) להשוואת תוצאות בין קבוצות.</p>
+                        <div class="mitigation-target">מרכיב סיכון: הטיות לא מודעות</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-execution">⚙️ ביצוע</span>
+                            <span class="editable">ג. סקירת תוכן על ידי מומחי גיוון</span>
+                        </div>
+                        <p class="editable">בדיקה ידנית של מדגם תכנים על ידי אנשים מרקעים מגוונים.</p>
+                        <div class="mitigation-target">מרכיב סיכון: הטיות תרבותיות עדינות</div>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-control">📊 בקרה</span>
+                            <span class="editable">ד. ניטור פערים בתוצאות</span>
+                        </div>
+                        <p class="editable">השוואת ציונים, המלצות מסלול, וזמני למידה בין קבוצות דמוגרפיות. התראה על פערים חריגים.</p>
+                        <div class="mitigation-target">מרכיב סיכון: הטיות שמצטברות לאורך זמן</div>
+                    </div>
+                </div>
+
+                <div class="standard-recommendation">
+                    <h4>📋 המלצה לתקן:</h4>
+                    <p class="editable">לדרוש מספקים <strong>דוח הוגנות (Fairness Report)</strong> שנתי שמציג: (1) קטגוריות שנבדקו, (2) מתודולוגיה, (3) ממצאים, (4) פעולות תיקון. לשקול שיתוף פעולה עם גופי אקדמיה לפיתוח מתודולוגיית בדיקה.</p>
+                </div>
+            </div>
+
+            <!-- Risk 4.3 -->
+            <div class="risk-card">
+                <div class="risk-header">
+                    <div class="risk-title editable">4.3 קושי טכני בזיהוי אוטומטי של הטיות והזיות</div>
+                    <div class="risk-badge badge-medium">בינונית 🟠</div>
+                </div>
+                <div class="risk-scores">
+                    <span class="score-item">הסתברות: <strong>7/10</strong></span>
+                    <span class="score-item">השפעה: <strong>5/10</strong></span>
+                    <span class="score-item">חומרה: <strong>35</strong></span>
+                </div>
+
+                <div class="risk-description editable">
+                    <strong>תיאור הסיכון:</strong><br>
+                    אין כיום <strong>פתרון טכנולוגי מושלם</strong> לזיהוי אוטומטי של הזיות והטיות. הכלים הקיימים חלקיים ודורשים משאבים. ספקים קטנים עלולים להתקשות לעמוד בדרישות מחמירות.
+                </div>
+                
+                <div class="implications-section">
+                    <h4>📉 השלכות אפשריות:</h4>
+                    <ul>
+                        <li class="editable">עלויות גבוהות ליישום בדיקות מקיפות</li>
+                        <li class="editable">הסתמכות על בדיקות ידניות יקרות</li>
+                        <li class="editable">פערים ביכולות בין ספקים גדולים לקטנים</li>
+                    </ul>
+                </div>
+
+                <div class="mitigation-section">
+                    <h4>🔧 פעילויות מתקנות:</h4>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-planning">📐 תכנון</span>
+                            <span class="editable">א. דרישות מדורגות לפי גודל ספק</span>
+                        </div>
+                        <p class="editable">ספקים גדולים: בדיקות אוטומטיות + ידניות. ספקים קטנים: דגימה ידנית + מנגנון דיווח.</p>
+                    </div>
+                    <div class="mitigation-item">
+                        <div class="mitigation-title">
+                            <span class="phase-badge phase-execution">⚙️ ביצוע</span>
+                            <span class="editable">ב. ארגז כלים משותף לספקים</span>
+                        </div>
+                        <p class="editable">פיתוח או אימוץ כלים לזיהוי הזיות/הטיות שיהיו זמינים לכל הספקים.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">📊 סיכום רמות חומרה</h3>
+            <div class="summary-grid">
+                <div class="summary-card high">
+                    <div class="number">5</div>
+                    <div class="label">🔴 סיכונים ברמה גבוהה (49-90)</div>
+                </div>
+                <div class="summary-card medium">
+                    <div class="number">4</div>
+                    <div class="label">🟠 סיכונים ברמה בינונית (25-48)</div>
+                </div>
+                <div class="summary-card low">
+                    <div class="number">0</div>
+                    <div class="label">🟢 סיכונים ברמה נמוכה (1-24)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recommendations for Standard -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">📋</span>
+                <h2 class="editable">המלצות לבניית התקן</h2>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">נקודת הצהרה</th>
+                            <th style="width: 40%;">המלצה מרכזית לתקן</th>
+                            <th style="width: 35%;">מדדי הצלחה מוצעים</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1️⃣ חובת גילוי</strong></td>
+                            <td class="editable">להגדיר 3 קריטריונים: שפה מותאמת לגיל, מיקום בולט, תדירות בכל אינטראקציה AI. לספק SDK סטנדרטי.</td>
+                            <td class="editable">• 90% מהתלמידים מבינים שמדובר ב-AI<br>• עקביות 100% בין ספקים</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2️⃣ מעורבות אנושית</strong></td>
+                            <td class="editable">מודל 3 רמות אוטומציה עם טבלה ברורה. Dashboard למורה על פעולות אוטומטיות.</td>
+                            <td class="editable">• 100% מפעולות רמה 3 מאושרות ע"י מורה<br>• פחות מ-20 בקשות אישור ביום למורה</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3️⃣ זיהוי מצוקות</strong></td>
+                            <td class="editable">AI ככלי סיוע, לא אבחון. פרוטוקול מדורג עם איש מקצוע. בדיקת הטיות תרבותיות.</td>
+                            <td class="editable">• 100% מההתראות מגיעות לאיש מקצוע<br>• פחות מ-30% False Positives</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4️⃣ הטיות והזיות</strong></td>
+                            <td class="editable">ציון מקור לתוכן עובדתי. דוח הוגנות שנתי. מנגנון דיווח נגיש.</td>
+                            <td class="editable">• פחות מ-2% הזיות בתוכן עובדתי<br>• פער מקסימלי 10% בתוצאות בין קבוצות</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="context-highlight" style="margin-top: 1.5rem;">
+                <h4 style="margin-bottom: 0.5rem;">🎯 עקרונות מנחים לתקן:</h4>
+                <ol style="padding-right: 1.5rem;">
+                    <li class="editable"><strong>שקיפות:</strong> תלמידים, מורים והורים יודעים מה ה-AI עושה</li>
+                    <li class="editable"><strong>שליטה אנושית:</strong> אדם תמיד מעורב בהחלטות משמעותיות</li>
+                    <li class="editable"><strong>בטיחות:</strong> הגנה על שלומות התלמידים היא בראש סדר העדיפויות</li>
+                    <li class="editable"><strong>הוגנות:</strong> המערכת לא מפלה ולא מנציחה הטיות</li>
+                    <li class="editable"><strong>אחריותיות:</strong> ברור מי אחראי ומה עושים כשיש בעיה</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>פיתוח ועיצוב המוצר: <strong>ד"ר אסף אוזן</strong></p>
+            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #718096;">
+                נוצר: דצמבר 2024 | גרסה: 1.0 | הצהרת שימוש בבינה מלאכותית
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        let isEditMode = false;
+        let originalContent = '';
+
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            document.body.classList.toggle('edit-mode', isEditMode);
+            document.getElementById('editIndicator').classList.toggle('active', isEditMode);
+            document.getElementById('saveBtn').style.display = isEditMode ? 'flex' : 'none';
+            document.getElementById('cancelBtn').style.display = isEditMode ? 'flex' : 'none';
+
+            const editables = document.querySelectorAll('.editable');
+            editables.forEach(el => {
+                el.contentEditable = isEditMode;
+            });
+
+            if (isEditMode) {
+                originalContent = document.body.innerHTML;
+            }
+        }
+
+        function saveChanges() {
+            toggleEditMode();
+            localStorage.setItem('risk-management-ai-declaration', document.body.innerHTML);
+            alert('השינויים נשמרו בהצלחה!');
+        }
+
+        function cancelChanges() {
+            if (confirm('האם אתה בטוח שברצונך לבטל את כל השינויים?')) {
+                document.body.innerHTML = originalContent;
+                toggleEditMode();
+            }
+        }
+
+        function exportHTML() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'risk-management-ai-declaration.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        window.onload = function() {
+            const saved = localStorage.getItem('risk-management-ai-declaration');
+            if (saved && confirm('נמצא תוכן שמור. האם לטעון אותו?')) {
+                document.body.innerHTML = saved;
+            }
+        };
+    </script>
+</body>
+</html>
